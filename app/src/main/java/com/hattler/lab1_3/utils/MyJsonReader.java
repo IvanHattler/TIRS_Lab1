@@ -1,20 +1,14 @@
 package com.hattler.lab1_3.utils;
 
-import android.content.Context;
-
-import com.hattler.lab1_3.Todo;
+import com.hattler.lab1_3.domain.Todo;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +18,7 @@ public class MyJsonReader {
         String jsonText = readText(fileName);
 
         JSONArray arr = new JSONArray(jsonText);
-        ArrayList<Todo> result = new ArrayList<Todo>(arr.length());
+        ArrayList<Todo> result = new ArrayList<>(arr.length());
 
         for(int i=0;i < arr.length();i++) {
             JSONObject jsonRoot = arr.getJSONObject(i);
@@ -51,7 +45,7 @@ public class MyJsonReader {
     public static String readText(String fileName) throws IOException {
         try(BufferedReader br = new BufferedReader(new FileReader(fileName))){
             StringBuilder sb= new StringBuilder();
-            String s = null;
+            String s;
             while((s = br.readLine())!=null) {
                 sb.append(s);
                 sb.append("\n");

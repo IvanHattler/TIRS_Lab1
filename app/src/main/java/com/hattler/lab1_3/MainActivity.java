@@ -12,16 +12,10 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import com.hattler.lab1_3.domain.Todo;
 import com.hattler.lab1_3.services.TodoService;
-import com.hattler.lab1_3.utils.MyJsonReader;
-import com.hattler.lab1_3.utils.MyJsonWriter;
 import com.hattler.lab1_3.utils.Utilities;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -104,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
 
     @NonNull
     private ArrayList<String> toStringList(List<Todo> todos) {
-        ArrayList<String> todosText = new ArrayList<String>();
+        ArrayList<String> todosText = new ArrayList<>();
         for (Todo todo: todos) {
             todosText.add(todo.toString());
         }

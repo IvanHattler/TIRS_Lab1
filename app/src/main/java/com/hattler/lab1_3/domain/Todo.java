@@ -1,4 +1,4 @@
-package com.hattler.lab1_3;
+package com.hattler.lab1_3.domain;
 
 import androidx.annotation.NonNull;
 

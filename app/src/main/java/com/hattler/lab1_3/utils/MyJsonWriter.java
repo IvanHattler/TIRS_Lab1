@@ -1,20 +1,13 @@
 package com.hattler.lab1_3.utils;
 
-import android.content.Context;
 import android.util.JsonWriter;
 
-import com.hattler.lab1_3.Todo;
+import com.hattler.lab1_3.domain.Todo;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.Writer;
-import java.sql.Timestamp;
 import java.util.List;
 
 public class MyJsonWriter {

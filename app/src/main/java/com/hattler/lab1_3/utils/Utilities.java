@@ -1,6 +1,6 @@
 package com.hattler.lab1_3.utils;
 
-import com.hattler.lab1_3.Todo;
+import com.hattler.lab1_3.domain.Todo;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;

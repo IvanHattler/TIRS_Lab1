@@ -1,8 +1,6 @@
 package com.hattler.lab1_3.services;
 
-import androidx.annotation.NonNull;
-
-import com.hattler.lab1_3.Todo;
+import com.hattler.lab1_3.domain.Todo;
 import com.hattler.lab1_3.utils.MyJsonReader;
 import com.hattler.lab1_3.utils.MyJsonWriter;
 
@@ -51,7 +49,7 @@ public class TodoService {
 
     public static void clearJson(String fileName){
         try {
-            MyJsonWriter.writeText(fileName, new ArrayList<Todo>());
+            MyJsonWriter.writeText(fileName, new ArrayList<>());
         } catch (IOException e) {
             e.printStackTrace();
         }
