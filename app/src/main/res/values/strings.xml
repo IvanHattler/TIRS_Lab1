@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Lab1_3</string>
+    <string name="hourTableFormat">%d:00 - %d:00</string>
 </resources>

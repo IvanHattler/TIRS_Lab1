@@ -2,9 +2,15 @@ package com.hattler.lab1_3;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDialogFragment;
+import androidx.fragment.app.FragmentManager;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.CalendarView;
 import android.widget.ListView;
@@ -16,78 +22,112 @@ import com.hattler.lab1_3.domain.Todo;
 import com.hattler.lab1_3.services.TodoService;
 import com.hattler.lab1_3.utils.Utilities;
 
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    @SuppressLint("SetTextI18n")
+    private List<Todo> todos;
+    private int selectedIndex;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        final String MAIN_FILE_PATH = getFilesDir().getAbsolutePath() + "/todos.json";
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //String[]  list = fileList();
-        //deleteFile("todos.json");
-        //deleteFile("todos");
-        //list = fileList();
+        final String MAIN_FILE_PATH = getFilesDir().getAbsolutePath() + "/todos.json";
 
+        initTodos(MAIN_FILE_PATH);
+
+        initHourTable();
+
+        initCalendarView(MAIN_FILE_PATH);
+
+        initListView(MAIN_FILE_PATH);
+    }
+
+    private void initTodos(String MAIN_FILE_PATH) {
         TodoService.clearJson(MAIN_FILE_PATH);
         TodoService.setTodos(MAIN_FILE_PATH, Utilities.getDefaultList());
+        todos = TodoService.getTodos(MAIN_FILE_PATH);
+    }
 
-        String a = TodoService.getJsonText(MAIN_FILE_PATH);
-
+    private void initCalendarView(String fileName) {
         CalendarView calendarView = findViewById(R.id.calendarView);
         calendarView.setOnDateChangeListener((view, year, month, dayOfMonth) -> {
-            month++;
-            String dateString = String.format("%d-%d-%d 00:00:00", year, month, dayOfMonth);
-            String dateString2 = String.format("%d-%d-%d 01:00:00", year, month, dayOfMonth);
+            clearHourTable();
 
-            Todo newTodo = new Todo();
-            newTodo.setName("asf");
-            newTodo.setDescription("ewq");
-            newTodo.setDate_start(Timestamp.valueOf(dateString));
-            newTodo.setDate_finish(Timestamp.valueOf(dateString2));
-
-            TodoService.addTodo(MAIN_FILE_PATH, newTodo);
-
-            setListView(MAIN_FILE_PATH);
-
-            List<Todo> a1 = TodoService.getTodos(MAIN_FILE_PATH);
+            List<Todo> todos = TodoService.getTodos(fileName);
+            for (Todo todo : todos) {
+                Timestamp timestamp = todo.getDate_start();
+                if (timestamp != null
+                        && Utilities.getYear(timestamp) == year
+                        && Utilities.getMonth(timestamp) == month
+                        && Utilities.getDayOfMonth(timestamp) == dayOfMonth){
+                    int hour = Utilities.getHour(todo.getDate_start());
+                    TextView textView = findViewById(1488 + hour - 1);
+                    textView.setBackgroundResource(R.color.purple_200);
+                    textView.setText(String.format("[%s]", textView.getText()));
+                    selectedIndex = todos.indexOf(todo);
+                }
+            }
         });
+    }
 
-        int BOOKSHELF_ROWS = 5;
-        int BOOKSHELF_COLUMNS = 5;
+    private void clearHourTable(){
+        for (int i = 1; i < 25; i++){
+            TextView textView = findViewById(1488 + i);
+            textView.setBackgroundResource(R.color.white);
+            CharSequence text = textView.getText();
+            if (text.charAt(0) == '['){
+                text = substring(text);
+                textView.setText(text);
+            }
 
+        }
+    }
+
+    @NonNull
+    private CharSequence substring(CharSequence text) {
+        text = text.subSequence(1, text.length());
+        text = text.subSequence(0, text.length() - 1);
+        return text;
+    }
+
+    private void initHourTable() {
+        final int HOUR_ROWS = 5;
+        final int HOUR_COLUMNS = 5;
         TableLayout tableLayout = (TableLayout) findViewById(R.id.tableLayout);
-
-        int hour = 0;
-        for (int i = 0; i < BOOKSHELF_ROWS; i++) {
+        int hour = 1;
+        for (int i = 0; i < HOUR_ROWS; i++) {
             TableRow tableRow = new TableRow(this);
-            //tableRow.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT,
-            //        TableRow.LayoutParams.WRAP_CONTENT));
-            //tableRow.setBackgroundResource(R.drawable.shelf);
-
-            for (int j = 0; j < BOOKSHELF_COLUMNS; j++) {
+            for (int j = 0; j < HOUR_COLUMNS && hour < 25; j++) {
                 TextView textView = new TextView(this);
-                textView.setText(Integer.toString(hour));
-
+                String t = String.format(getString(R.string.hourTableFormat), hour - 1, hour);
+                textView.setText(t);
+                textView.setId(1488 + hour);
+                textView.setTextSize(12);
+                textView.setClickable(true);
+                textView.setPadding(10,50,10,50);
+                textView.setOnClickListener(v -> {
+                    TextView tv = (TextView)v;
+                    if (tv.getText().charAt(0) == '['){
+                        onCreateDialog(tv).show();
+                    }
+                });
                 tableRow.addView(textView, j);
                 hour++;
             }
 
             tableLayout.addView(tableRow, i);
         }
-
-        setListView(MAIN_FILE_PATH);
     }
 
-    private void setListView(String MAIN_FILE_PATH) {
+    private void initListView(String fileName) {
         ListView listView = findViewById(R.id.mainListView);
         try {
-            List<Todo> todos = TodoService.getTodos(MAIN_FILE_PATH);
-            ArrayList<String> todosText = toStringList(todos);
+            List<Todo> todos = TodoService.getTodos(fileName);
+            ArrayList<String> todosText = Utilities.toStringList(todos);
             ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
                     android.R.layout.simple_list_item_1, todosText);
             listView.setAdapter(adapter);
@@ -96,12 +136,14 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @NonNull
-    private ArrayList<String> toStringList(List<Todo> todos) {
-        ArrayList<String> todosText = new ArrayList<>();
-        for (Todo todo: todos) {
-            todosText.add(todo.toString());
-        }
-        return todosText;
+    public Dialog onCreateDialog(TextView textView) {
+        Todo todo = todos.get(selectedIndex);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Дело " + substring(textView.getText()))
+                .setMessage(todo.getDescription())
+                .setPositiveButton("Ок", (dialog, id) -> {
+                    dialog.cancel();
+                });
+        return builder.create();
     }
 }
